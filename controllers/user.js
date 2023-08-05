@@ -53,7 +53,7 @@ const getCurrentUserInfo = (req, res, next) => {
         next(ApiError.BadRequest('Некорректный id пользователя'));
         return;
       }
-      next(ApiError.InnerError(e.message));
+      next(e);
     });
 };
 
@@ -64,7 +64,7 @@ const getUsers = (req, res, next) => {
     })
     .then((users) => res.send(users))
     .catch((e) => {
-      next(ApiError.InnerError(e.message));
+      next(e);
     });
 };
 
@@ -79,7 +79,7 @@ const getUserById = (req, res, next) => {
         next(ApiError.BadRequest('Некорректный id пользователя'));
         return;
       }
-      next(ApiError.InnerError(e.message));
+      next(e);
     });
 };
 
@@ -103,7 +103,7 @@ const updateProfile = (req, res, next) => {
         next(ApiError.BadRequest('Некорректный id пользователя'));
         return;
       }
-      next(ApiError.InnerError(e.message));
+      next(e);
     });
 };
 
@@ -126,7 +126,7 @@ const updateAvatar = (req, res, next) => {
       if (e.errors) {
         next(ApiError.BadRequest(Object.values(e.errors)[0].message));
       }
-      next(ApiError.InnerError(e.message));
+      next(e);
     });
 };
 

@@ -27,7 +27,7 @@ const createCard = (req, res, next) => {
       if (e.errors) {
         next(ApiError.BadRequest(Object.values(e.errors)[0].message));
       }
-      next(ApiError.InnerError('Ошибка при создании карточки'));
+      next(e);
     });
 };
 
@@ -53,7 +53,7 @@ const deleteCard = (req, res, next) => {
         next(ApiError.BadRequest('Некорректный id карточки'));
         return;
       }
-      next(ApiError.InnerError('Ошибка при удалении карточки'));
+      next(e);
     });
 };
 
@@ -73,7 +73,7 @@ const putLike = (req, res, next) => {
         next(ApiError.BadRequest('Некорректный id карточки'));
         return;
       }
-      next(ApiError.InnerError('Ошибка при установке лайка на карточку'));
+      next(e);
     });
 };
 
@@ -93,7 +93,7 @@ const deleteLike = (req, res, next) => {
         next(ApiError.BadRequest('Некорректный id карточки'));
         return;
       }
-      next(ApiError.InnerError('Ошибка при удалении лайка карточки'));
+      next(e);
     });
 };
 
