@@ -14,13 +14,13 @@ const createUser = (req, res, next) => {
 
   UserService.registration(name, about, avatar, email, password).then((token) => {
     res.cookie('accessToken', token, {
-      maxAge: ms(process.env.JWT_ACCESS_EXPIRES_IN),
+      maxAge: ms('7d'),
       httpOnly: true,
     });
 
     res.status(200).send(token);
   }).catch((e) => {
-    next(ApiError.BadRequest(e.message));
+    next(e);
   });
 };
 
@@ -37,13 +37,13 @@ const login = (req, res, next) => {
 
   UserService.login(email, password).then((token) => {
     res.cookie('accessToken', token, {
-      maxAge: ms(process.env.JWT_ACCESS_EXPIRES_IN),
+      maxAge: ms('7d'),
       httpOnly: true,
     });
 
     res.status(200).send(token);
-  }).catch((err) => {
-    next(ApiError.Unauthorized(err.message));
+  }).catch((e) => {
+    next(e);
   });
 };
 
