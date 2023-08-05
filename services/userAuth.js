@@ -45,7 +45,13 @@ class UserService {
             throw ApiError.Unauthorized('Введен неверный пароль');
           }
           return tokenService.generateToken({ _id: user._id });
-        }));
+        }))
+      .catch((e) => {
+        if (e.errors) {
+          throw ApiError.BadRequest(Object.values(e.errors)[0].message);
+        }
+        throw ApiError.InnerError(e.message);
+      });
   }
 }
 

@@ -24,21 +24,11 @@ const createUser = (req, res, next) => {
       avatar,
       email,
     });
-  }).catch((e) => {
-    next(e);
-  });
+  }).catch((e) => next(e));
 };
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-
-  if (!email) {
-    next(ApiError.Unauthorized('Не указан email'));
-  }
-
-  if (!password) {
-    next(ApiError.Unauthorized('Не указан пароль'));
-  }
 
   UserService.login(email, password).then((token) => {
     res.cookie('accessToken', token, {
@@ -47,9 +37,7 @@ const login = (req, res, next) => {
     });
 
     res.status(200).send({ token });
-  }).catch((e) => {
-    next(e);
-  });
+  }).catch((e) => next(e));
 };
 
 const getCurrentUserInfo = (req, res, next) => {
@@ -60,7 +48,13 @@ const getCurrentUserInfo = (req, res, next) => {
     .then((user) => {
       res.send(user);
     })
-    .catch((err) => next(err));
+    .catch((e) => {
+      if (e.name === 'CastError') {
+        next(ApiError.BadRequest('Некорректный id пользователя'));
+        return;
+      }
+      next(ApiError.InnerError(e.message));
+    });
 };
 
 const getUsers = (req, res, next) => {
@@ -69,8 +63,8 @@ const getUsers = (req, res, next) => {
       next(ApiError.NotFound('Пользователи не были найдены'));
     })
     .then((users) => res.send(users))
-    .catch((err) => {
-      next(err);
+    .catch((e) => {
+      next(ApiError.InnerError(e.message));
     });
 };
 
@@ -80,8 +74,12 @@ const getUserById = (req, res, next) => {
       next(ApiError.NotFound('Пользователь с данным id не найден'));
     })
     .then((user) => res.send(user))
-    .catch(() => {
-      next(ApiError.NotFound('Некорректный id пользователя'));
+    .catch((e) => {
+      if (e.name === 'CastError') {
+        next(ApiError.BadRequest('Некорректный id пользователя'));
+        return;
+      }
+      next(ApiError.InnerError(e.message));
     });
 };
 
@@ -97,8 +95,15 @@ const updateProfile = (req, res, next) => {
       next(ApiError.NotFound('Пользователь с данным id не найден'));
     })
     .then((user) => res.send(user))
-    .catch(() => {
-      next(ApiError.BadRequest('Некорректные данные или id пользователя'));
+    .catch((e) => {
+      if (e.errors) {
+        next(ApiError.BadRequest(Object.values(e.errors)[0].message));
+      }
+      if (e.name === 'CastError') {
+        next(ApiError.BadRequest('Некорректный id пользователя'));
+        return;
+      }
+      next(ApiError.InnerError(e.message));
     });
 };
 
@@ -113,8 +118,15 @@ const updateAvatar = (req, res, next) => {
       next(ApiError.NotFound('Пользователь с данным id не найден'));
     })
     .then((user) => res.send(user))
-    .catch(() => {
-      next(ApiError.BadRequest('Некорректные данные или id пользователя'));
+    .catch((e) => {
+      if (e.name === 'CastError') {
+        next(ApiError.BadRequest('Некорректный id пользователя'));
+        return;
+      }
+      if (e.errors) {
+        next(ApiError.BadRequest(Object.values(e.errors)[0].message));
+      }
+      next(ApiError.InnerError(e.message));
     });
 };
 

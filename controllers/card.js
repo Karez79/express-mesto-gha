@@ -1,4 +1,3 @@
-const { ObjectId } = require('mongoose').Types;
 const Card = require('../models/card');
 const ApiError = require('../exceptions/api-error');
 
@@ -10,8 +9,8 @@ const getCards = (req, res, next) => {
     .then((cards) => {
       res.send(cards);
     })
-    .catch((err) => {
-      next(err);
+    .catch((e) => {
+      next(e);
     });
 };
 
@@ -28,16 +27,11 @@ const createCard = (req, res, next) => {
       if (e.errors) {
         next(ApiError.BadRequest(Object.values(e.errors)[0].message));
       }
-      next(ApiError.BadRequest('Некорректные данные'));
+      next(ApiError.InnerError('Ошибка при создании карточки'));
     });
 };
 
 const deleteCard = (req, res, next) => {
-  if (!ObjectId.isValid(req.params.cardId)) {
-    next(ApiError.BadRequest('Некорректный id карточки'));
-    return;
-  }
-
   Card
     .findById(req.params.cardId)
     .orFail(() => {
@@ -49,22 +43,21 @@ const deleteCard = (req, res, next) => {
         return;
       }
 
-      Card.findByIdAndRemove(req.params.cardId)
+      Card.deleteOne(card)
         .then((removedCard) => {
           res.send(removedCard);
         });
     })
-    .catch(() => {
-      next(ApiError.BadRequest('Некорректные данные'));
+    .catch((e) => {
+      if (e.name === 'CastError') {
+        next(ApiError.BadRequest('Некорректный id карточки'));
+        return;
+      }
+      next(ApiError.InnerError('Ошибка при удалении карточки'));
     });
 };
 
 const putLike = (req, res, next) => {
-  if (!ObjectId.isValid(req.params.cardId)) {
-    next(ApiError.BadRequest('Некорректный id карточки'));
-    return;
-  }
-
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -75,17 +68,16 @@ const putLike = (req, res, next) => {
     .then((card) => {
       res.send(card);
     })
-    .catch(() => {
-      next(ApiError.BadRequest('Некорректный id карточки или пользователя'));
+    .catch((e) => {
+      if (e.name === 'CastError') {
+        next(ApiError.BadRequest('Некорректный id карточки'));
+        return;
+      }
+      next(ApiError.InnerError('Ошибка при установке лайка на карточку'));
     });
 };
 
 const deleteLike = (req, res, next) => {
-  if (!ObjectId.isValid(req.params.cardId)) {
-    next(ApiError.BadRequest('Некорректный id карточки'));
-    return;
-  }
-
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -96,8 +88,12 @@ const deleteLike = (req, res, next) => {
     .then((card) => {
       res.send(card);
     })
-    .catch(() => {
-      next(ApiError.BadRequest('Некорректные данные или id карточки'));
+    .catch((e) => {
+      if (e.name === 'CastError') {
+        next(ApiError.BadRequest('Некорректный id карточки'));
+        return;
+      }
+      next(ApiError.InnerError('Ошибка при удалении лайка карточки'));
     });
 };
 
