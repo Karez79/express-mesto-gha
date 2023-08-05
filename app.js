@@ -12,10 +12,12 @@ const authMiddleware = require('./middlewares/auth');
 const ApiError = require('./exceptions/api-error');
 const userController = require('./controllers/user');
 const avatarUrlRegexp = require('./services/avatarUrlRegexp');
+const rateLimit = require('./services/limiter');
 
 const app = express();
 
 app.use(helmet());
+app.use(rateLimit);
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.post('/signin', celebrate({
