@@ -48,9 +48,9 @@ class UserService {
         }))
       .catch((e) => {
         if (e.errors) {
-          throw ApiError.BadRequest(Object.values(e.errors)[0].message);
+          throw ApiError.Unauthorized(Object.values(e.errors)[0].message);
         }
-        throw ApiError.InnerError(e.message);
+        throw ApiError.Unauthorized(e.message);
       });
   }
 }
