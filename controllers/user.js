@@ -18,7 +18,7 @@ const createUser = (req, res, next) => {
       httpOnly: true,
     });
 
-    res.status(200).send(token);
+    res.status(200).send({ token });
   }).catch((e) => {
     next(e);
   });
@@ -41,7 +41,7 @@ const login = (req, res, next) => {
       httpOnly: true,
     });
 
-    res.status(200).send(token);
+    res.status(200).send({ token });
   }).catch((e) => {
     next(e);
   });
