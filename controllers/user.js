@@ -18,7 +18,13 @@ const createUser = (req, res, next) => {
       httpOnly: true,
     });
 
-    res.status(200).send({ token });
+    res.status(200).send({
+      name,
+      about,
+      avatar,
+      email,
+      password,
+    });
   }).catch((e) => {
     next(e);
   });

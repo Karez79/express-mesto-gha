@@ -22,7 +22,7 @@ router.patch('/me', celebrate({
     avatar: Joi.string().regex(avatarUrlRegexp),
   }),
 }), userController.updateProfile);
-router.patch('/me/avatar',celebrate({
+router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().regex(avatarUrlRegexp),
   }),

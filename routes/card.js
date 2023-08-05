@@ -9,8 +9,8 @@ const router = new Router();
 router.get('/', cardController.getCards);
 router.post('/', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    link: Joi.string().regex(avatarUrlRegexp),
+    name: Joi.string().min(2).max(30).required(),
+    link: Joi.string().regex(avatarUrlRegexp).required(),
   }),
 }), cardController.createCard);
 router.delete('/:cardId', celebrate({
@@ -19,7 +19,11 @@ router.delete('/:cardId', celebrate({
   }),
 }), cardController.deleteCard);
 
-router.put('/:cardId/likes', cardController.putLike);
+router.put('/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().regex(objectIdRegexp),
+  }),
+}), cardController.putLike);
 router.delete('/:cardId/likes', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().regex(objectIdRegexp),
