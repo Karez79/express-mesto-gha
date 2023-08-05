@@ -23,7 +23,6 @@ const createUser = (req, res, next) => {
       about,
       avatar,
       email,
-      password,
     });
   }).catch((e) => {
     next(e);
