@@ -26,6 +26,7 @@ const createCard = (req, res, next) => {
     .catch((e) => {
       if (e.errors) {
         next(ApiError.BadRequest(Object.values(e.errors)[0].message));
+        return;
       }
       next(e);
     });

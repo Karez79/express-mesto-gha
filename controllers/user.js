@@ -62,10 +62,10 @@ const getUsers = (req, res, next) => {
     .orFail(() => {
       next(ApiError.NotFound('Пользователи не были найдены'));
     })
-    .then((users) => res.send(users))
-    .catch((e) => {
-      next(e);
-    });
+    .then((users) => {
+      res.send(users);
+    })
+    .catch((e) => next(e));
 };
 
 const getUserById = (req, res, next) => {
@@ -98,6 +98,7 @@ const updateProfile = (req, res, next) => {
     .catch((e) => {
       if (e.errors) {
         next(ApiError.BadRequest(Object.values(e.errors)[0].message));
+        return;
       }
       if (e.name === 'CastError') {
         next(ApiError.BadRequest('Некорректный id пользователя'));
@@ -125,6 +126,7 @@ const updateAvatar = (req, res, next) => {
       }
       if (e.errors) {
         next(ApiError.BadRequest(Object.values(e.errors)[0].message));
+        return;
       }
       next(e);
     });
